@@ -18,7 +18,7 @@ usage() {
 session_num=0
 
 set_session() {
-    if [[ ! "$1" =~ ^[0-9]+ ]]; then
+    if [[ ! "$1" =~ ^[0-9]+$ ]]; then
         echo -e "Invalid session number: $1\n"
         usage
     fi
