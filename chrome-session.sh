@@ -7,7 +7,7 @@
 script_dir="$(cd "$(dirname "$([[ -h "$0" ]] && readlink "$0" || echo "$0")")" && pwd)"
 
 usage() {
-    echo "Usage: $(basename "$0") [-s session-number]"
+    echo "Usage: $(basename "$0") [[-s] session-number]"
     echo -e "\nOptions:"
     echo -e "\t-s"
     echo -e "\t\tnth session to launch"
@@ -17,14 +17,18 @@ usage() {
 # defaults
 session_num=0
 
+set_session() {
+    if [[ ! "$1" =~ ^[0-9]+ ]]; then
+        echo -e "Invalid session number: $1\n"
+        usage
+    fi
+    session_num="$1"
+}
+
 while getopts "s:" opt; do
     case "$opt" in
-        s)
-            if [[ ! "$OPTARG" =~ ^[0-9]+ ]]; then
-                echo -e "Invalid session number: $OPTARG\n"
-                usage
-            fi
-            session_num=$OPTARG
+        s) 
+            set_session "$OPTARG"
         ;;
         *) 
             usage
@@ -33,9 +37,9 @@ while getopts "s:" opt; do
 done
 OPTIND=1
 
-# support 'this.sh help' and prevent unintentional misuse with flags
-if [[ ${#1} -gt 0 && $(printf -- "$1" | grep -c '^-') -le 0 ]]; then
-    usage
+# support shorthand session number selection and prevent unintentional misuse
+if [[ ${#1} -gt 0 ]]; then
+    set_session "$1"
 fi
 
 # detect OS to support overrides
